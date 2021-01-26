@@ -93,6 +93,7 @@ namespace UC_UML_Error_Finder
                                 {
                                     type = Types.Comment;
                                     string to = childnode.Attributes.GetNamedItem("annotatedElement")?.Value;
+                                    name = childnode.Attributes.GetNamedItem("body")?.Value;
                                     elements.Add(id, new Arrow(id, type, name, parent, null, to));
                                 }
                                 else
@@ -140,6 +141,7 @@ namespace UC_UML_Error_Finder
                             {
                                 type = Types.Comment;
                                 string to = childnode.Attributes.GetNamedItem("annotatedElement")?.Value;
+                                name = childnode.Attributes.GetNamedItem("body")?.Value;
                                 elements.Add(id, new Arrow(id, type, name, parent, null, to));
                             }
                             else

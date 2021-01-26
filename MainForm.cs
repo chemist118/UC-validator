@@ -25,25 +25,7 @@ namespace UC_UML_Error_Finder
 
         public void ShowInfo()
         {
-            Reader reader = new Reader(output, elements);
-
-            XmlNode UMLpackage = Reader.InitFile(filename);
-            if (UMLpackage == null) return;
-
-            reader.ReadData(UMLpackage);
-
-            output.Text += "Найдены элементы:\n";
-            foreach (var el in elements.Values)
-            {
-                output.Text += $": {el.Type}:{el.Name}:\n";
-                if (el is Arrow)
-                {
-                    Arrow ar = (Arrow)el;
-                    output.Text += $"from {ar.From} to {ar.To}\n";
-                }
-            }
-
-            Checker checker = new Checker(output, elemets);
+            Checker checker = new Checker(output, elements);
             checker.Check();
         }
 
@@ -55,11 +37,29 @@ namespace UC_UML_Error_Finder
             // получаем выбранный файл
             filename = openFileDialog.FileName;
 
-            if (Reader.InitFile(filename) != null)
+            elements.Clear();
+
+            Reader reader = new Reader(output, elements);
+            XmlNode UMLpackage = Reader.InitFile(filename);
+
+            if (UMLpackage != null)
             {
                 Text = $"UC UML Error Finder {openFileDialog.SafeFileName}";
                 output.Text = $"Открыт документ: {openFileDialog.SafeFileName}\n";
                 btnLaunch.Enabled = true;
+
+                reader.ReadData(UMLpackage);
+
+                output.Text += "Найдены элементы:\n";
+                foreach (var el in elements.Values)
+                {
+                    output.Text += $": {el.Type}:{el.Name}:\n";
+                    if (el is Arrow)
+                    {
+                        Arrow ar = (Arrow)el;
+                        output.Text += $"from {ar.From} to {ar.To}\n";
+                    }
+                }
             }
             else
                 FileError();
