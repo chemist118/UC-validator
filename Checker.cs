@@ -20,6 +20,7 @@ namespace UC_UML_Error_Finder
         {
             CheckTokenizing();
         }
+        #region Lexical Analisys
         void CheckTokenizing()
         {
             CheckActors();
@@ -30,7 +31,6 @@ namespace UC_UML_Error_Finder
         void CheckActors()
         {
             var actors = elements.Where(element => element.Value.Type == Types.Actor);
-
             foreach (var actorName in actors.GroupBy(a => a.Value.Name))
             {
                 if (actorName.Count() > 1)
@@ -60,7 +60,15 @@ namespace UC_UML_Error_Finder
                 if (string.IsNullOrEmpty(point.Value.Name.Trim()))
                     output.Text += $"Ошибка: Отсутствует текст в точке расширения прецедента\n";
 
-            var precedent = elements.Where(element => element.Value.Type == Types.Precedent);
+            var precedents = elements.Where(element => element.Value.Type == Types.Precedent);
+            foreach (var precedentName in precedents.GroupBy(p => p.Value.Name))
+            {
+                if (precedentName.Count() > 1)
+                    output.Text += $"Ошибка: Имя прецедента повторяется: {precedentName.Key}\n";
+                if (string.IsNullOrEmpty(precedentName.Key.Trim()) || !char.IsUpper(precedentName.Key[0]))
+                    output.Text += $"Ошибка: Имя прецедента должно быть представлено в виде действия, начинаясь с заглавной буквы: {precedentName.Key}\n";
+            }
         }
+        #endregion
     }
 }
