@@ -49,17 +49,6 @@ namespace UC_UML_Error_Finder
                 btnLaunch.Enabled = true;
 
                 reader.ReadData(UMLpackage);
-
-                output.Text += "Найдены элементы:\n";
-                foreach (var el in elements.Values)
-                {
-                    output.Text += $": {el.Type}:{el.Name}:\n";
-                    if (el is Arrow)
-                    {
-                        Arrow ar = (Arrow)el;
-                        output.Text += $"from {ar.From} to {ar.To}\n";
-                    }
-                }
             }
             else
                 FileError();
