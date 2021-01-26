@@ -182,7 +182,8 @@ namespace UC_UML_Error_Finder
                         }
                     case Types.ExtensionPoint:
                         {
-                            elements.Add(id, new Element(id, type, name, parent));
+                            string to = childnode.Attributes.GetNamedItem("useCase")?.Value;
+                            elements.Add(id, new Arrow(id, type, name, parent, null, to));
                             break;
                         }
                     default:

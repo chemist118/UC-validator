@@ -18,16 +18,13 @@ namespace UC_UML_Error_Finder
         }
         public void Check()
         {
-            CheckTokenizing();
-        }
-        #region Lexical Analisys
-        void CheckTokenizing()
-        {
             CheckActors();
             CheckComments();
             СheckPackages();
             CheckPrecedents();
         }
+
+        #region Checks
         void CheckActors()
         {
             var actors = elements.Where(element => element.Value.Type == Types.Actor);
@@ -68,6 +65,54 @@ namespace UC_UML_Error_Finder
                 if (string.IsNullOrEmpty(precedentName.Key.Trim()) || !char.IsUpper(precedentName.Key[0]))
                     output.Text += $"Ошибка: Имя прецедента должно быть представлено в виде действия, начинаясь с заглавной буквы: {precedentName.Key}\n";
             }
+
+            foreach (var precedent in precedents)
+            {
+                bool haveAssociation = HaveConnection(precedent.Value.Id, Types.Association),
+                    haveGeneralization = HaveConnection(precedent.Value.Id, Types.Generalization),
+                    haveExtendsion = HaveConnection(precedent.Value.Id, Types.Extend),
+                    haveIncluding = HaveConnection(precedent.Value.Id, Types.Include);
+
+                if (!haveAssociation && !haveGeneralization && !haveExtendsion && !haveIncluding)
+                    output.Text += $"Ошибка: Прецедент должен иметь связь с актором в виде ассоциации," +
+                        $" либо иметь отношения расширения," +
+                        $" дополнения или включения с другими прецедентами: {precedent.Value.Name}\n";
+
+                if (haveExtendsion)
+                {
+                    bool havePoint = elements.Where(element =>
+                    {
+                        if (element.Value.Type != Types.ExtensionPoint) return false;
+                        if (((Arrow)element.Value).To.Equals(precedent.Key))
+                            return true;
+                        return false;
+                    }).Count() > 0;
+                    bool extended = elements.Where(element =>
+                    {
+                        if (element.Value.Type != Types.Extend) return false;
+                        if (((Arrow)element.Value).To.Equals(precedent.Key))
+                            return true;
+                        return false;
+                    }).Count() > 0;
+
+                    if(extended && !havePoint)
+                        output.Text += $"Ошибка: Отсутствие точки расширения у прецедента с связью extend: {precedent.Value.Name}\n";
+                }
+            }
+        }
+        #endregion
+
+        #region Support Functions
+        bool HaveConnection(string id, string type)
+        {
+            var assosiations = elements.Where(element => element.Value.Type == type);
+            return assosiations.Where(a =>
+            {
+                if (((Arrow)a.Value).To.Equals(id) ||
+                ((Arrow)a.Value).From.Equals(id))
+                    return true;
+                return false;
+            }).Count() > 0;
         }
         #endregion
     }
