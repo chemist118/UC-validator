@@ -35,6 +35,12 @@ namespace UC_UML_Error_Finder
                 if (string.IsNullOrEmpty(actorName.Key.Trim()) || !char.IsUpper(actorName.Key[0]))
                     output.Text += $"Ошибка: Имя актора должно быть представлено в виде существительного с заглавной буквы: {actorName.Key}\n";
             }
+
+            foreach(var actor in actors)
+            {
+                if(!HaveConnection(actor.Key, Types.Association))
+                    output.Text += $"Актор не имеет ни одной связи типа ассоцияция с прецедентами: {actor.Value.Name}\n";
+            }
         }
         void CheckComments()
         {
@@ -96,7 +102,21 @@ namespace UC_UML_Error_Finder
                     }).Count() > 0;
 
                     if(extended && !havePoint)
-                        output.Text += $"Ошибка: Отсутствие точки расширения у прецедента с связью extend: {precedent.Value.Name}\n";
+                        output.Text += $"Ошибка: Отсутствие точки расширения у прецедента с связью расширения: {precedent.Value.Name}\n";
+                }
+
+                if (haveIncluding)
+                {
+                    int includesCount = elements.Where(element =>
+                    {
+                        if (element.Value.Type != Types.Include) return false;
+                        if (((Arrow)element.Value).From.Equals(precedent.Key))
+                            return true;
+                        return false;
+                    }).Count();
+
+                    if(includesCount > 0 && includesCount < 2)
+                        output.Text += $"Предупреждение: Прецедент включает всего один прецедент: {precedent.Value.Name}\n";
                 }
             }
         }
